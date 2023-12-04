@@ -1,0 +1,11 @@
+port: 8080
+client_id:
+client_secret:
+eureka_address: # eureka地址
+auth_address: # auth地址
+process_authorization_seconds: 180
+authorization_fresh: 7000
+redis: # redis配置
+  host: http://127.0.0.1
+  port: 6379
+  password:
