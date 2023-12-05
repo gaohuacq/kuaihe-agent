@@ -6,14 +6,22 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"product_kuaihe/config"
 	"product_kuaihe/model"
 )
 
 func LaunchRequest(method, url string, body *Params) ([]byte, error) {
 	s := Session{Timeout: 20, Datatype: "json"}
+	// AccessToken获取
+	accessToken, tokenType, err := config.Authorization()
+	if err != nil {
+		return nil, err
+	}
+	s.AccessToken = accessToken
+	s.TokenType = tokenType
 
 	res := model.OpenApiResponse{}
-	_, err := s.Post(url, nil, &body, &res, nil)
+	_, err = s.Post(url, nil, &body, &res, nil)
 	if err != nil {
 		return nil, err
 	}

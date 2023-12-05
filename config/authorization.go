@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -12,15 +13,25 @@ import (
 )
 
 // Authorization 获取token
-func Authorization() error {
+func Authorization() (string, string, error) {
+	// 先从redis缓存获取
+	accessToken := RedisClient.Get(model.AuthorizationAccessToken).Val()
+	if accessToken != "" {
+		tokenNew := strings.Split(accessToken, ":")
+		if len(tokenNew) != 2 {
+			return "", "", errors.New("accessToken错误")
+		}
+		return tokenNew[0], tokenNew[1], nil
+	}
+
 	authResponse, err := getAuthorization()
 	if err != nil {
-		return err
+		return "", "", err
 	}
 	if authResponse.AccessToken == "" || authResponse.TokenType == "" || authResponse.ExpiresIn == 0 {
-		return errors.New("accessToken获取失败")
+		return "", "", errors.New("accessToken获取失败")
 	}
-	return nil
+	return authResponse.AccessToken, authResponse.TokenType, nil
 }
 
 // CheckAccessToken token校验
@@ -63,12 +74,8 @@ func getAuthorization() (*model.AuthorizationResp, error) {
 		return nil, err
 	}
 
-	// 处理到内存
-	AccessToken = authResponse.AccessToken
-	TokenType = authResponse.TokenType
-
 	// redis缓存 将过期时间扣除秒 提前处理
-	if err := RedisClient.Set(model.AuthorizationAccessToken, authResponse.AccessToken,
+	if err := RedisClient.Set(model.AuthorizationAccessToken, fmt.Sprintf("%v:%v", authResponse.AccessToken, authResponse.TokenType),
 		time.Duration(authResponse.ExpiresIn-GlobalConfig.ProcessAuthorizationSeconds)).Err(); err != nil {
 		return nil, err
 	}

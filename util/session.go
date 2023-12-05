@@ -12,7 +12,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"product_kuaihe/config"
 	"strings"
 	"time"
 )
@@ -23,6 +22,8 @@ type Session struct {
 	Userinfo        *url.Userinfo
 	Header          *http.Header
 	Params          *Params
+	TokenType       string
+	AccessToken     string
 	IgnoreEmptyBody bool   // 是否忽略空body
 	IgnoreRedirect  bool   // 是否忽略重定向
 	Datatype        string // 请求数据传输类型
@@ -88,7 +89,7 @@ func (s *Session) send(r *Request) (body string, err error) {
 	var req *http.Request
 	var str []byte
 
-	header.Set("Authorization", fmt.Sprintf("%v %v", config.TokenType, config.AccessToken))
+	header.Set("Authorization", fmt.Sprintf("%v %v", s.TokenType, s.AccessToken))
 	header.Set("Content-Type", "application/json; charset=utf-8") // 先增加 之后覆写
 
 	if r.Payload != nil {

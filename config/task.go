@@ -12,9 +12,9 @@ func InitTask() {
 	times := fmt.Sprintf("*/%v * * * *", GlobalConfig.AuthorizationFresh)
 	// ----------------------------- 定时刷新本服务的accessToken ------------------------------
 	if _, err := cronJob.AddFunc(times, func() {
-		if err := Authorization(); err != nil {
-			fmt.Errorf("定时刷新accessToken失败!", err)
-		}
+		//if err := Authorization(); err != nil {
+		//	fmt.Errorf("定时刷新accessToken失败!", err)
+		//}
 	}); err != nil {
 		log.Fatal("定时刷新accessToken定时任务增加失败!", err)
 	}

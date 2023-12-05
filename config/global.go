@@ -10,11 +10,8 @@ import (
 
 var (
 	GlobalConfig *Config
-	AccessToken  string
-	TokenType    string
 	RedisClient  *redis.Client
 	EurekaClient *eureka.Client
-	//GlobalRedis  *redis.c
 )
 
 func InitRedis() error {

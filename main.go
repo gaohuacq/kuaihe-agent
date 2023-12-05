@@ -31,15 +31,6 @@ func main() {
 		return
 	}
 
-	// AccessToken初始化
-	if err := config.Authorization(); err != nil {
-		log.Fatal("accessToken初始化失败")
-		return
-	}
-
-	// 定时任务增加
-	config.InitTask()
-
 	// eureka服务发现初始化到redis
 	if err := config.EurekaProviderServeAddress(config.GlobalConfig.EurekaAddress); err != nil {
 		log.Fatal(err)
