@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type Params map[string]string
+type Params map[string]interface{}
 
 type Request struct {
 	URL     string      // Raw URL string

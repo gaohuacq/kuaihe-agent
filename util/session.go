@@ -75,7 +75,8 @@ func (s *Session) send(r *Request) (body string, err error) {
 	}
 	vals := u.Query()
 	for k, v := range p {
-		vals.Set(k, v)
+		bJson, _ := json.Marshal(v)
+		vals.Set(k, string(bJson))
 	}
 	u.RawQuery = vals.Encode()
 
@@ -98,8 +99,10 @@ func (s *Session) send(r *Request) (body string, err error) {
 			if err != nil {
 				return
 			}
+			fmt.Printf("请求数据:%+v\n", string(str))
 			buf := bytes.NewBuffer(str)
 			req, err = http.NewRequest(r.Method, u.String(), buf)
+
 			if err != nil {
 				return
 			}
@@ -155,9 +158,11 @@ func (s *Session) send(r *Request) (body string, err error) {
 	}
 	//解析body
 	if string(r.body) != "" {
+		fmt.Println(string(r.body), "sldfjklksdjf", resp.StatusCode, "\n", r.Result)
 		if resp.StatusCode < 300 && r.Result != nil {
 			if s.Datatype == "json" {
 				err = json.Unmarshal(r.body, r.Result)
+				fmt.Println(err, "jsonMarshal error")
 			}
 		}
 		if resp.StatusCode >= 400 && r.Error != nil {

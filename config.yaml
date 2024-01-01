@@ -1,11 +1,11 @@
-port: 8080
-client_id:
-client_secret:
-eureka_address: # eureka地址
-auth_address: # auth地址
+port: 8089
+client_id: kuaihe-mp-test
+client_secret: xf6y7AqYSd22wYhrOScm3ovKHOVn6itN
+eureka_address: https://gateway-eureka-test.19k8s.cn/eureka # eureka地址
+auth_address: https://auth-test.dw.19k8s.com # auth地址
 process_authorization_seconds: 180
 authorization_fresh: 7000
 redis: # redis配置
-  host: http://127.0.0.1
+  host: 127.0.0.1
   port: 6379
   password:

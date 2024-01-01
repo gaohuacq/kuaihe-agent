@@ -19,15 +19,21 @@ func LaunchRequest(method, url string, body *Params) ([]byte, error) {
 	}
 	s.AccessToken = accessToken
 	s.TokenType = tokenType
-
 	res := model.OpenApiResponse{}
-	_, err = s.Post(url, nil, &body, &res, nil)
+	var errInfo model.OpenApiFailResponse
+	_, err = s.Post(url, nil, &body, &res, &errInfo)
 	if err != nil {
 		return nil, err
 	}
+
+	if errInfo.Status != 0 {
+		return nil, fmt.Errorf("error:%v, message:%v, path:%v, status:%v, timestamp:%v", errInfo.Error, errInfo.Message, errInfo.Path, errInfo.Status, errInfo.Timestamp)
+	}
+
 	if res.Code != 200 {
 		return nil, errors.New(fmt.Sprintf("code:%v,msg:%v,ts:%v,notification:%v", res.Code, res.Msg, res.Ts, res.Notification))
 	}
+
 	fmt.Printf("获取到解析出来的数据: %+v\n", res)
 	bJson, err := json.Marshal(res.Data)
 	if err != nil {

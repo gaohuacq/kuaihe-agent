@@ -9,15 +9,14 @@ import (
 	"net/url"
 	"product_kuaihe/model"
 	"strings"
-	"time"
 )
 
 // Authorization 获取token
 func Authorization() (string, string, error) {
 	// 先从redis缓存获取
-	accessToken := RedisClient.Get(model.AuthorizationAccessToken).Val()
-	if accessToken != "" {
-		tokenNew := strings.Split(accessToken, ":")
+	accessToken, err := FreeCache.Get([]byte(model.AuthorizationAccessToken))
+	if string(accessToken) != "" {
+		tokenNew := strings.Split(string(accessToken), ":")
 		if len(tokenNew) != 2 {
 			return "", "", errors.New("accessToken错误")
 		}
@@ -75,8 +74,9 @@ func getAuthorization() (*model.AuthorizationResp, error) {
 	}
 
 	// redis缓存 将过期时间扣除秒 提前处理
-	if err := RedisClient.Set(model.AuthorizationAccessToken, fmt.Sprintf("%v:%v", authResponse.AccessToken, authResponse.TokenType),
-		time.Duration(authResponse.ExpiresIn-GlobalConfig.ProcessAuthorizationSeconds)).Err(); err != nil {
+	if err := FreeCache.Set([]byte(model.AuthorizationAccessToken),
+		[]byte(fmt.Sprintf("%v:%v", authResponse.AccessToken, authResponse.TokenType)),
+		int(authResponse.ExpiresIn-GlobalConfig.ProcessAuthorizationSeconds)); err != nil {
 		return nil, err
 	}
 	return &authResponse, nil

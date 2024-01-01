@@ -12,9 +12,12 @@ import (
 	"net/http"
 	"net/url"
 	"product_kuaihe/config"
+	"product_kuaihe/middleware"
 	"product_kuaihe/model"
 	modelPro "product_kuaihe/model/product_center"
 	"product_kuaihe/service/product_center"
+	"product_kuaihe/service/promotion"
+	"product_kuaihe/service/ucenter"
 	"strings"
 )
 
@@ -25,21 +28,34 @@ func main() {
 		return
 	}
 
-	// redis初始化
-	if err := config.InitRedis(); err != nil {
-		log.Fatal("redis初始化失败")
+	// 本地缓存初始化
+	if err := config.InitFreeCache(); err != nil {
+		log.Fatal("本地缓存初始化失败", err)
 		return
 	}
 
-	// eureka服务发现初始化到redis
+	// eureka服务发现初始化
 	if err := config.EurekaProviderServeAddress(config.GlobalConfig.EurekaAddress); err != nil {
-		log.Fatal(err)
+		log.Fatal("eureka链接失败", err)
 		return
 	}
 
 	// 创建路由
 	router := fasthttprouter.New()
-	router.POST("/product/search", ProductSearch)
+
+	// PRODUCT-GATEWAY
+	router.POST("/product/search", middleware.Cors(ProductSearch)) // 商品搜索
+
+	// PROMOTION-GATEWAY
+	router.POST("/coupon/create", middleware.Cors(promotion.CreateCoupon))            // 创建券
+	router.POST("/coupon/del", middleware.Cors(promotion.DelCoupon))                  // 删除用户的券
+	router.POST("/coupon/query", middleware.Cors(promotion.GetCoupon))                // 查询券
+	router.POST("/coupon/operate", middleware.Cors(promotion.CouponOnlineAnfOffline)) // 券上下架
+	router.POST("/user/coupon", middleware.Cors(promotion.CreateUserCoupon))          // 给用户发券
+
+	// UCENTER-GATEWAY
+	router.POST("/user", middleware.Cors(ucenter.GetUserInfoByOpenIdOrAccessToken)) // 根据信息获取用户的key
+
 	log.Fatal(fasthttp.ListenAndServe(fmt.Sprintf(":%v", config.GlobalConfig.Port), router.Handler))
 }
 
@@ -56,10 +72,12 @@ func ProductSearch(ctx *fasthttp.RequestCtx) {
 		Page:         1,
 	})
 	if err != nil {
-		fmt.Println(err)
+		ctx.Error(err.Error(), http.StatusOK)
+		return
 	}
 	bJson, _ := json.Marshal(resp)
 	ctx.Response.Write(bufio.NewWriter(bytes.NewBuffer(bJson)))
+	return
 }
 
 // Auth 测试方便用 获取clientid的 accesstoken
