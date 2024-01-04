@@ -43,3 +43,8 @@ restapi/v3/productgather/business/product/detail =======>  /publicapi/v1/product
 
 restapi/v2/productgather/business/product/preSaleDetail =======> 
   ```
+
+
+```
+docker build -t harbor.19k8s.cn/kuaihe-hz/kuaihe-agent --platform linux/amd64 .
+```

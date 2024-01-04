@@ -26,17 +26,19 @@ func GetUserInfoByOpenIdOrAccessToken(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	success := false
+	var err error
 	for _, address := range config.GetServiceAddressUCenter() {
-		if resp, err := getUserInfoRequest(address, req.AppId, req.OpenId); err == nil {
+		if resp, reqErr := getUserInfoRequest(address, req.AppId, req.OpenId); reqErr == nil {
 			util.ResponseProcess(ctx, resp, "success", 0)
 			success = true
 			break
 		} else {
+			err = reqErr
 			fmt.Println("GetUserInfoByOpenIdOrAccessToken Error making request to", address, ":", err)
 		}
 	}
 	if !success {
-		util.ResponseProcess(ctx, nil, "Internet Error", 1)
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
 		// TODO 触发重新获取地址的任务
 	}
 	return

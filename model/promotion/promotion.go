@@ -214,3 +214,5 @@ type CouponOnlineAndOfflineReq struct {
 	Ids              []int64 `json:"ids"`              // 优惠券ids
 	OperateJobNumber string  `json:"operateJobNumber"` // 操作者工号
 }
+
+// ----------------------------- 运营区获取 ------------------------------
