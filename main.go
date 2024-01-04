@@ -50,7 +50,7 @@ func main() {
 	router.POST("/coupon/create", middleware.Cors(promotion.CreateCoupon))            // 创建券
 	router.POST("/coupon/del", middleware.Cors(promotion.DelCoupon))                  // 删除用户的券
 	router.POST("/coupon/query", middleware.Cors(promotion.GetCoupon))                // 查询券
-	router.GET("/index", middleware.Cors(HelloWorld))                                 //
+	router.GET("/", middleware.Cors(HelloWorld))                                      //
 	router.POST("/coupon/operate", middleware.Cors(promotion.CouponOnlineAnfOffline)) // 券上下架
 	router.POST("/user/coupon", middleware.Cors(promotion.CreateUserCoupon))          // 给用户发券
 
