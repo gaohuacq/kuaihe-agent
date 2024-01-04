@@ -18,6 +18,7 @@ import (
 	"product_kuaihe/service/product_center"
 	"product_kuaihe/service/promotion"
 	"product_kuaihe/service/ucenter"
+	"product_kuaihe/util"
 	"strings"
 )
 
@@ -61,7 +62,7 @@ func main() {
 }
 
 func HelloWorld(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Write(bufio.NewWriter(bytes.NewBuffer([]byte("server is start success"))))
+	util.ResponseProcess(ctx, nil, "server start success", 0)
 	return
 }
 
