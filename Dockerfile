@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine as builder
+FROM harbor.19k8s.cn/kuaihe-hz/golang:1.19-alpine as builder
 
 WORKDIR /go/src/kuaihe-agent
 COPY . .
