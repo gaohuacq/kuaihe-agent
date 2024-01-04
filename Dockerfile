@@ -9,13 +9,13 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 # 设置golang环境变量 编译
 RUN go env -w GO111MODULE=on && \
     go env -w GOPROXY=https://goproxy.cn,direct && \
-    go env -w CGO_ENABLED=0 && \
+    go env -w CGO_ENABLED=0 GOOS=linux GOARCH=amd64 && \
     go mod tidy && \
-    go build GOOS=linux GOARCH=amd64 -o kuaihe .
+    go build -o kuaihe .
 
 FROM alpine:latest
 
-WORKDIR /go/src/kuaihe-agent
+WORKDIR /go/src/kuaihe
 
 COPY --from=0 /go/src/kuaihe-agent/kuaihe ./
 COPY --from=0 /go/src/kuaihe-agent/config.yaml ./
