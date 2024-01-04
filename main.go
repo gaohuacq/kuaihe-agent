@@ -57,7 +57,7 @@ func main() {
 
 	// UCENTER-GATEWAY
 	router.POST("/user", middleware.Cors(ucenter.GetUserInfoByOpenIdOrAccessToken)) // 根据信息获取用户的key
-
+	fmt.Println("server start run on:", config.GlobalConfig.Port)
 	log.Fatal(fasthttp.ListenAndServe(fmt.Sprintf(":%v", config.GlobalConfig.Port), router.Handler))
 }
 
