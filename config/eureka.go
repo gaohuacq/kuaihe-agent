@@ -62,8 +62,16 @@ func EurekaProviderServeAddress(address string) error {
 			//fmt.Printf("  健康状态：%s\n", instance.Status)
 		}
 	}
-	setServiceAddressUCenter(ucenter)
-	setServiceAddressPromotion(promotion)
+	if len(ucenter) > 0 {
+		setServiceAddressUCenter(ucenter)
+	} else {
+		return errors.New("ucenter地址获取失败")
+	}
+	if len(promotion) > 0 {
+		setServiceAddressPromotion(promotion)
+	} else {
+		return errors.New("promotion服务地址获取失败")
+	}
 	return nil
 }
 
