@@ -50,6 +50,7 @@ func main() {
 	router.POST("/coupon/create", middleware.Cors(promotion.CreateCoupon))            // 创建券
 	router.POST("/coupon/del", middleware.Cors(promotion.DelCoupon))                  // 删除用户的券
 	router.POST("/coupon/query", middleware.Cors(promotion.GetCoupon))                // 查询券
+	router.GET("/index", middleware.Cors(HelloWorld))                                 //
 	router.POST("/coupon/operate", middleware.Cors(promotion.CouponOnlineAnfOffline)) // 券上下架
 	router.POST("/user/coupon", middleware.Cors(promotion.CreateUserCoupon))          // 给用户发券
 
@@ -57,6 +58,11 @@ func main() {
 	router.POST("/user", middleware.Cors(ucenter.GetUserInfoByOpenIdOrAccessToken)) // 根据信息获取用户的key
 
 	log.Fatal(fasthttp.ListenAndServe(fmt.Sprintf(":%v", config.GlobalConfig.Port), router.Handler))
+}
+
+func HelloWorld(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Write(bufio.NewWriter(bytes.NewBuffer([]byte("server is start success"))))
+	return
 }
 
 func ProductSearch(ctx *fasthttp.RequestCtx) {
