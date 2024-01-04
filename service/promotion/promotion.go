@@ -48,17 +48,19 @@ func CreateCoupon(ctx *fasthttp.RequestCtx) {
 	}
 
 	success := false
+	var err error
 	for _, address := range config.GetServiceAddressPromotion() {
-		if resp, err := createCoupon(param, address); err == nil {
+		if resp, reqErr := createCoupon(param, address); reqErr == nil {
 			util.ResponseProcess(ctx, resp, "success", 0)
 			success = true
 			break
 		} else {
+			err = reqErr
 			fmt.Println("CreateCoupon Error making request to", address, ":", err)
 		}
 	}
 	if !success {
-		util.ResponseProcess(ctx, nil, "Internet Error", 1)
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
 		// TODO 触发重新获取地址的任务
 	}
 	return
@@ -96,17 +98,19 @@ func CreateUserCoupon(ctx *fasthttp.RequestCtx) {
 		"sendCouponReqItemVos":  req.SendCouponReqItemVos,
 	}
 	success := false
+	var err error
 	for _, address := range config.GetServiceAddressPromotion() {
-		if resp, err := createUserCoupon(param, address); err == nil {
+		if resp, reqErr := createUserCoupon(param, address); reqErr == nil {
 			util.ResponseProcess(ctx, resp, "success", 0)
 			success = true
 			break
 		} else {
+			err = reqErr
 			fmt.Println("CreateUserCoupon Error making request to", address, ":", err)
 		}
 	}
 	if !success {
-		util.ResponseProcess(ctx, nil, "Internet Error", 1)
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
 		// TODO 触发重新获取地址的任务
 	}
 	return
@@ -142,17 +146,19 @@ func DelCoupon(ctx *fasthttp.RequestCtx) {
 	}
 
 	success := false
+	var err error
 	for _, address := range config.GetServiceAddressPromotion() {
-		if resp, err := delCoupon(param, address); err == nil {
+		if resp, reqErr := delCoupon(param, address); reqErr == nil {
 			util.ResponseProcess(ctx, resp, "success", 0)
 			success = true
 			break
 		} else {
+			err = reqErr
 			fmt.Println("DelCoupon Error making request to", address, ":", err)
 		}
 	}
 	if !success {
-		util.ResponseProcess(ctx, nil, "Internet Error", 1)
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
 		// TODO 触发重新获取地址的任务
 	}
 	return
@@ -188,17 +194,19 @@ func GetCoupon(ctx *fasthttp.RequestCtx) {
 		"couponId": req.CouponId,
 	}
 	success := false
+	var err error
 	for _, address := range config.GetServiceAddressPromotion() {
-		if resp, err := getCoupon(param, address); err == nil {
+		if resp, reqErr := getCoupon(param, address); reqErr == nil {
 			util.ResponseProcess(ctx, resp, "success", 0)
 			success = true
 			break
 		} else {
+			err = reqErr
 			fmt.Println("GetCoupon Error making request to", address, ":", err)
 		}
 	}
 	if !success {
-		util.ResponseProcess(ctx, nil, "Internet Error", 1)
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
 		// TODO 触发重新获取地址的任务
 	}
 	return
@@ -237,17 +245,19 @@ func CouponOnlineAnfOffline(ctx *fasthttp.RequestCtx) {
 	}
 
 	success := false
+	var err error
 	for _, address := range config.GetServiceAddressPromotion() {
-		if resp, err := couponOnlineAnfOffline(param, address); err == nil {
+		if resp, reqErr := couponOnlineAnfOffline(param, address); reqErr == nil {
 			util.ResponseProcess(ctx, resp, "success", 0)
 			success = true
 			break
 		} else {
+			err = reqErr
 			fmt.Println("CouponOnlineAnfOffline Error making request to", address, ":", err)
 		}
 	}
 	if !success {
-		util.ResponseProcess(ctx, nil, "Internet Error", 1)
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
 		// TODO 触发重新获取地址的任务
 	}
 	return

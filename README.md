@@ -1,4 +1,4 @@
-# product_kuaihe
+# kuaihe_agent
 
     快喝走服务发现的方式的demo程序 目前仅仅copy了 商品聚合服务的一部分接口
 
