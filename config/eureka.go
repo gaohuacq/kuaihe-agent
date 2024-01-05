@@ -13,6 +13,7 @@ var (
 
 	userCenterAddress      []string // "http://10.49.189.147:80"  // 用户中心地址
 	promotionCenterAddress []string // "http://10.49.170.2:31559" // 促销中心
+	partnerCenterAddress   []string // 门店中心
 
 	EvaluateCenterAddress = "" // 评价中心
 	ProductCenterAddress  = "" // 商品中心地址
@@ -41,12 +42,13 @@ func EurekaProviderServeAddress(address string) error {
 
 	ucenter := make([]string, 0)
 	promotion := make([]string, 0)
+	hzzOpenApi := make([]string, 0)
 
 	// 遍历应用程序并打印它们的名称和实例数量
 	for _, app := range applications.Applications {
-		//fmt.Printf("应用程序名称：%s\n", app.Name)
-		//fmt.Printf("实例数量：%d\n", len(app.Instances))
-		//fmt.Println("实例详细信息：")
+		fmt.Printf("应用程序名称：%s\n", app.Name)
+		fmt.Printf("实例数量：%d\n", len(app.Instances))
+		fmt.Println("实例详细信息：")
 		for _, instance := range app.Instances {
 			// 券中心
 			if strings.ToUpper(app.Name) == "PROMOTION-GATEWAY" {
@@ -56,10 +58,14 @@ func EurekaProviderServeAddress(address string) error {
 			if strings.ToUpper(app.Name) == "UCENTER-GATEWAY" {
 				ucenter = append(ucenter, fmt.Sprintf("%v:%v", instance.HostName, instance.Port.Port))
 			}
-			//fmt.Printf("  实例ID：%s\n", instance.InstanceID)
-			//fmt.Printf("  主机名：%s\n", instance.HostName)
-			//fmt.Printf("  地址：%s:%d\n", instance.HostName, instance.Port.Port)
-			//fmt.Printf("  健康状态：%s\n", instance.Status)
+
+			if strings.ToUpper(app.Name) == "HZZ-OPENAPI-GATEWAY" {
+				hzzOpenApi = append(hzzOpenApi, fmt.Sprintf("%v:%v", instance.HostName, instance.Port.Port))
+			}
+			fmt.Printf("  实例ID：%s\n", instance.InstanceID)
+			fmt.Printf("  主机名：%s\n", instance.HostName)
+			fmt.Printf("  地址：%s:%d\n", instance.HostName, instance.Port.Port)
+			fmt.Printf("  健康状态：%s\n", instance.Status)
 		}
 	}
 	if len(ucenter) > 0 {
@@ -72,7 +78,27 @@ func EurekaProviderServeAddress(address string) error {
 	} else {
 		return errors.New("promotion服务地址获取失败")
 	}
+	if len(hzzOpenApi) > 0 {
+		setServiceAddressHzzOpenApi(hzzOpenApi)
+	} else {
+		return errors.New("hzzOpenApi服务地址获取失败")
+	}
 	return nil
+}
+
+func setServiceAddressHzzOpenApi(hzzOpenApi []string) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	partnerCenterAddress = nil
+	partnerCenterAddress = append(partnerCenterAddress, hzzOpenApi...)
+}
+
+func GetServiceAddressHzzOpenApi() []string {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	return append([]string{}, partnerCenterAddress...)
 }
 
 func setServiceAddressUCenter(address []string) {

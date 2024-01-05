@@ -275,3 +275,50 @@ func couponOnlineAnfOffline(param util.Params, address string) (bool, error) {
 	}
 	return false, nil
 }
+
+func GetArea(ctx *fasthttp.RequestCtx) {
+	newRequest := &fasthttp.Request{}
+	ctx.Request.CopyTo(newRequest)
+
+	var req promotion.StoreDetailListReq
+	if err := json.Unmarshal(newRequest.Body(), &req); err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+	param := util.Params{
+		"page":         req.Page,
+		"pageCode":     req.PageCode,
+		"size":         req.Size,
+		"parameterMap": req.ParameterMap,
+	}
+	success := false
+	var err error
+	for _, address := range config.GetServiceAddressHzzOpenApi() {
+		if resp, reqErr := areaGet(param, address); reqErr == nil {
+			util.ResponseProcess(ctx, resp, "success", 0)
+			success = true
+			break
+		} else {
+			err = reqErr
+			fmt.Println("GetArea Error making request to", address, ":", err)
+		}
+	}
+	if !success {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		// TODO 触发重新获取地址的任务
+	}
+}
+
+func areaGet(param util.Params, address string) (promotion.StoreDetailListResp, error) {
+	url := fmt.Sprintf("http://%v/partner/openapi/soa/storeDataList", address)
+
+	respData, err := util.LaunchRequest("POST", url, &param)
+	if err != nil {
+		return promotion.StoreDetailListResp{}, err
+	}
+	var resp promotion.StoreDetailListResp
+	if err = json.Unmarshal(respData, &resp); err != nil {
+		return promotion.StoreDetailListResp{}, err
+	}
+	return resp, nil
+}
