@@ -9,7 +9,7 @@ type ProductSearchReq struct {
 	Channel string `json:"channel"` // 渠道码
 	Size    int    `json:"size"`    // 分页大小
 	Keyword string `json:"keyword"` // 搜索关键字
-	Accross bool   `json:"accross"` // 是否跨店搜索
+	Across  bool   `json:"across"`  // 是否跨店搜索
 	Page    int    `json:"page"`    // 页
 
 	// 跨店搜索必填

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/buaazp/fasthttprouter"
@@ -14,7 +12,6 @@ import (
 	"product_kuaihe/config"
 	"product_kuaihe/middleware"
 	"product_kuaihe/model"
-	modelPro "product_kuaihe/model/product_center"
 	"product_kuaihe/service/product_center"
 	"product_kuaihe/service/promotion"
 	"product_kuaihe/service/ucenter"
@@ -45,7 +42,7 @@ func main() {
 	router := fasthttprouter.New()
 
 	// PRODUCT-GATEWAY
-	router.POST("/product/search", middleware.Cors(ProductSearch)) // 商品搜索
+	router.POST("/product/search", middleware.Cors(product_center.ProductSearch)) // 商品搜索
 
 	// PROMOTION-GATEWAY
 	router.POST("/coupon/create", middleware.Cors(promotion.CreateCoupon))            // 创建券
@@ -71,24 +68,24 @@ func HelloWorld(ctx *fasthttp.RequestCtx) {
 }
 
 func ProductSearch(ctx *fasthttp.RequestCtx) {
-	resp, err := product_center.ProductSearch(modelPro.ProductSearchReq{
-		Channel:      "chihe",
-		Size:         5,
-		ProvinceCode: "510000",
-		Keyword:      "五粮液",
-		SortType:     "PRICE_ASC",
-		Accross:      true,
-		LocateLat:    "30.567067",
-		LocateLon:    "104.064753",
-		Page:         1,
-	})
-	if err != nil {
-		ctx.Error(err.Error(), http.StatusOK)
-		return
-	}
-	bJson, _ := json.Marshal(resp)
-	ctx.Response.Write(bufio.NewWriter(bytes.NewBuffer(bJson)))
-	return
+	//resp, err := product_center.ProductSearch(modelPro.ProductSearchReq{
+	//	Channel:      "chihe",
+	//	Size:         5,
+	//	ProvinceCode: "510000",
+	//	Keyword:      "五粮液",
+	//	SortType:     "PRICE_ASC",
+	//	Accross:      true,
+	//	LocateLat:    "30.567067",
+	//	LocateLon:    "104.064753",
+	//	Page:         1,
+	//})
+	//if err != nil {
+	//	ctx.Error(err.Error(), http.StatusOK)
+	//	return
+	//}
+	//bJson, _ := json.Marshal(resp)
+	//ctx.Response.Write(bufio.NewWriter(bytes.NewBuffer(bJson)))
+	//return
 }
 
 // Auth 测试方便用 获取clientid的 accesstoken

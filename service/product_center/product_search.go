@@ -4,53 +4,70 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/valyala/fasthttp"
 	"product_kuaihe/config"
 	"product_kuaihe/model/product_center"
 	"product_kuaihe/util"
 )
 
 // ProductSearch 商品搜索
-func ProductSearch(req product_center.ProductSearchReq) (*product_center.ProductSearchResp, error) {
+func ProductSearch(ctx *fasthttp.RequestCtx) {
+	newRequest := &fasthttp.Request{}
+	ctx.Request.CopyTo(newRequest)
+
+	var req product_center.ProductSearchReq
+	if err := json.Unmarshal(newRequest.Body(), &req); err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+
 	if req.Channel == "" {
-		return nil, errors.New("渠道参数不能为空")
+		util.ResponseProcess(ctx, nil, "渠道参数不能为空", 1)
+		return
 	}
 	if req.Size == 0 {
-		return nil, errors.New("每页数量不能为0")
+		util.ResponseProcess(ctx, nil, "每页数量不能为0", 1)
+		return
 	}
 	if req.Page == 0 {
-		return nil, errors.New("页码值不能为0")
+		util.ResponseProcess(ctx, nil, "页码值不能为0", 1)
+		return
 	}
 
-	if req.Accross && req.LocateLat == "" {
-		return nil, errors.New("定位纬度-跨店搜索必传")
+	if req.Across && req.LocateLat == "" {
+		util.ResponseProcess(ctx, nil, "定位纬度-跨店搜索必传", 1)
+		return
 	}
 
-	if req.Accross && req.LocateLon == "" {
-		return nil, errors.New("定位经度-跨店搜索必传")
+	if req.Across && req.LocateLon == "" {
+		util.ResponseProcess(ctx, nil, "定位经度-跨店搜索必传", 1)
+		return
 	}
 
-	if req.Accross && req.ProvinceCode == "" {
-		return nil, errors.New("省份编码-跨店搜索必传")
+	if req.Across && req.ProvinceCode == "" {
+		util.ResponseProcess(ctx, nil, "省份编码-跨店搜索必传", 1)
+		return
 	}
 
 	if req.Keyword == "" {
-		return nil, errors.New("搜索关键字不能为空")
+		util.ResponseProcess(ctx, nil, "搜索关键字不能为空", 1)
+		return
 	}
 
 	param := util.Params{
 		// 渠道编码 必填
 		"channel": req.Channel,
 		// 是否跨店搜索 必填
-		"accross": fmt.Sprintf("%v", req.Accross),
+		"accross": req.Across,
 		// 数量
-		"size": fmt.Sprintf("%v", req.Size),
+		"size": req.Size,
 		// 页码
-		"page": fmt.Sprintf("%v", req.Page),
+		"page": req.Page,
 		// 搜索关键字
 		"keyword": req.Keyword,
 	}
 
-	if req.Accross {
+	if req.Across {
 		// 定位纬度-跨店搜索需传
 		param["locateLat"] = req.LocateLat
 		// 定位经度-跨店搜索需传
@@ -120,18 +137,37 @@ func ProductSearch(req product_center.ProductSearchReq) (*product_center.Product
 		param["foodWine"] = req.FoodWine
 	}
 
-	url := fmt.Sprintf("%v/openapi/v1/productgather/business/product/search", config.ProductCenterAddress)
+	success := false
+	var err error
+	for _, address := range config.GetServiceAddressProductApi() {
+		if resp, reqErr := productSearch(param, address); reqErr == nil {
+			util.ResponseProcess(ctx, resp, "success", 0)
+			success = true
+			break
+		} else {
+			err = reqErr
+			fmt.Println("productSearch Error making request to", address, ":", err)
+		}
+	}
+	if !success {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		// TODO 触发重新获取地址的任务
+	}
+	return
+}
 
+func productSearch(param util.Params, address string) (product_center.ProductSearchResp, error) {
+	url := fmt.Sprintf("http://%v/openapi/v1/productgather/business/product/search", address)
 	respData, err := util.LaunchRequest("POST", url, &param)
 	if err != nil {
-		return nil, err
+		return product_center.ProductSearchResp{}, err
 	}
 
 	var resp product_center.ProductSearchResp
-	if err := json.Unmarshal(respData, &resp); err != nil {
-		return nil, err
+	if err = json.Unmarshal(respData, &resp); err != nil {
+		return product_center.ProductSearchResp{}, err
 	}
-	return &resp, nil
+	return resp, nil
 }
 
 // PreSaleSearch 预售商品搜索

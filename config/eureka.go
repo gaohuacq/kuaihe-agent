@@ -11,9 +11,10 @@ import (
 var (
 	mutex sync.Mutex
 
-	userCenterAddress      []string // "http://10.49.189.147:80"  // 用户中心地址
-	promotionCenterAddress []string // "http://10.49.170.2:31559" // 促销中心
+	userCenterAddress      []string // 用户中心地址
+	promotionCenterAddress []string // 促销中心
 	partnerCenterAddress   []string // 门店中心
+	productCenterAddress   []string // 商品中心
 
 	EvaluateCenterAddress = "" // 评价中心
 	ProductCenterAddress  = "" // 商品中心地址
@@ -62,12 +63,23 @@ func EurekaProviderServeAddress(address string) error {
 			if strings.ToUpper(app.Name) == "HZZ-OPENAPI-GATEWAY" {
 				hzzOpenApi = append(hzzOpenApi, fmt.Sprintf("%v:%v", instance.HostName, instance.Port.Port))
 			}
+
+			if strings.ToUpper(app.Name) == "PRODUCT-GATHER-GATEWAY" {
+				productCenterAddress = append(productCenterAddress, fmt.Sprintf("%v:%v", instance.HostName, instance.Port.Port))
+			}
 			fmt.Printf("  实例ID：%s\n", instance.InstanceID)
 			fmt.Printf("  主机名：%s\n", instance.HostName)
 			fmt.Printf("  地址：%s:%d\n", instance.HostName, instance.Port.Port)
 			fmt.Printf("  健康状态：%s\n", instance.Status)
 		}
 	}
+
+	if len(productCenterAddress) > 0 {
+		setServiceAddressProductApi(productCenterAddress)
+	} else {
+		return errors.New("productcenter地址获取失败")
+	}
+
 	if len(ucenter) > 0 {
 		setServiceAddressUCenter(ucenter)
 	} else {
@@ -84,6 +96,21 @@ func EurekaProviderServeAddress(address string) error {
 		return errors.New("hzzOpenApi服务地址获取失败")
 	}
 	return nil
+}
+
+func setServiceAddressProductApi(productAddress []string) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	productCenterAddress = nil
+	productCenterAddress = append(productCenterAddress, productAddress...)
+}
+
+func GetServiceAddressProductApi() []string {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	return append([]string{}, productCenterAddress...)
 }
 
 func setServiceAddressHzzOpenApi(hzzOpenApi []string) {
