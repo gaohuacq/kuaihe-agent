@@ -23,6 +23,7 @@ func CreateCoupon(ctx *fasthttp.RequestCtx) {
 	param := util.Params{
 		"applyRemark":            req.ApplyRemark,
 		"contain":                req.Contain,
+		"introduction":           req.Introduction,
 		"couponCutType":          req.CouponCutType,
 		"couponLimitType":        req.CouponLimitType,
 		"couponName":             req.CouponName,

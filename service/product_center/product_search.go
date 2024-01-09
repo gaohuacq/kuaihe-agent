@@ -229,15 +229,27 @@ func PreSaleSearch(req product_center.PreSaleListReq) ([]product_center.PreSaleP
 }
 
 // ProductDetail 渠道商品详情
-func ProductDetail(req product_center.ProductDetailQuery) (*product_center.ProductDetail, error) {
+func ProductDetail(ctx *fasthttp.RequestCtx) {
+	newRequest := &fasthttp.Request{}
+	ctx.Request.CopyTo(newRequest)
+
+	var req product_center.ProductDetailQuery
+	if err := json.Unmarshal(newRequest.Body(), &req); err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+
 	if req.Channel == "" {
-		return nil, errors.New("渠道参数不能为空")
+		util.ResponseProcess(ctx, nil, "渠道参数不能为空", 1)
+		return
 	}
 	if req.MasterSkuCode == "" {
-		return nil, errors.New("主商品编码不能为空")
+		util.ResponseProcess(ctx, nil, "主商品编码不能为空", 1)
+		return
 	}
 	if req.SkuCode == "" {
-		return nil, errors.New("商品编码不能为空")
+		util.ResponseProcess(ctx, nil, "商品编码不能为空", 1)
+		return
 	}
 
 	param := util.Params{
@@ -308,16 +320,34 @@ func ProductDetail(req product_center.ProductDetailQuery) (*product_center.Produ
 		param["storeCode"] = req.StoreCode
 	}
 
-	url := fmt.Sprintf("%v/publicapi/v1/productgather/business/product/detail", config.ProductCenterAddress)
+	success := false
+	var err error
+	for _, address := range config.GetServiceAddressProductApi() {
+		if resp, reqErr := productDetail(param, address); reqErr == nil {
+			util.ResponseProcess(ctx, resp, "success", 0)
+			success = true
+			break
+		} else {
+			err = reqErr
+			fmt.Println("productDetail Error making request to", address, ":", err)
+		}
+	}
+	if !success {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		// TODO 触发重新获取地址的任务
+	}
+	return
+}
 
+func productDetail(param util.Params, address string) (product_center.ProductDetail, error) {
+	url := fmt.Sprintf("http://%v/publicapi/v1/productgather/business/product/detail", address)
 	respData, err := util.LaunchRequest("POST", url, &param)
 	if err != nil {
-		return nil, err
+		return product_center.ProductDetail{}, err
 	}
-
 	var resp product_center.ProductDetail
-	if err := json.Unmarshal(respData, &resp); err != nil {
-		return nil, err
+	if err = json.Unmarshal(respData, &resp); err != nil {
+		return product_center.ProductDetail{}, err
 	}
-	return &resp, nil
+	return resp, nil
 }

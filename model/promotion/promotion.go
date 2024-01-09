@@ -4,6 +4,7 @@ package promotion
 
 type CreateCouponReq struct {
 	ApplyRemark            string                `json:"applyRemark"`            // 审核的申请原因(需要审核时才传)
+	Introduction           string                `json:"introduction"`           // 券介绍
 	Contain                bool                  `json:"contain"`                // 商品限制包含/不包含,默认包含
 	CouponCutType          string                `json:"couponCutType"`          // EXCHANGE 兑换券 DISCOUNT 折扣券 ORIDINARY 普通满减券 RANDOM 随机金额券
 	CouponLimitType        string                `json:"couponLimitType"`        // 商品限制类型 0 不限制 1 分类限制 2 品牌限制 3 单品限制

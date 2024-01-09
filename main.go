@@ -43,6 +43,7 @@ func main() {
 
 	// PRODUCT-GATEWAY
 	router.POST("/product/search", middleware.Cors(product_center.ProductSearch)) // 商品搜索
+	router.POST("/product/detail", middleware.Cors(product_center.ProductDetail)) // 获取商品详情
 
 	// PROMOTION-GATEWAY
 	router.POST("/coupon/create", middleware.Cors(promotion.CreateCoupon))            // 创建券
