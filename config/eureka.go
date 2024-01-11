@@ -30,10 +30,8 @@ var (
 type EurekaEntity struct{}
 
 func EurekaProviderServeAddress(address string) error {
-	client := eureka.NewClient([]string{
-		address, // 从Spring Boot基础的Eureka服务器获取地址
-		// 添加其他Eureka服务器地址（如果有的话）
-	})
+	addressList := strings.Split(address, ",")
+	client := eureka.NewClient(addressList)
 	EurekaClient = client
 	// 获取所有应用程序信息
 	applications, err := client.GetApplications()
