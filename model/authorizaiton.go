@@ -30,3 +30,17 @@ type CheckAccessToken struct {
 		} `json:"metaData,omitempty"`
 	} `json:"data"`
 }
+
+type DouYinUserInfo struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+	Ts   int64  `json:"ts"`
+	Data struct {
+		ApiType           string `json:"apiType"`
+		SourceProjectCode string `json:"sourceProjectCode"`
+		SourceApplication string `json:"sourceApplication"`
+		ClientId          string `json:"clientId"`
+		Username          string `json:"username"`
+		ExpireTime        int64  `json:"expireTime"`
+	} `json:"data"`
+}

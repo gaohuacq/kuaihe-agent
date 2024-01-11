@@ -101,3 +101,39 @@ func CheckAccessToken(ctx *fasthttp.RequestCtx) {
 	util.ResponseProcess(ctx, accessCheckData.Data, "success", 0)
 	return
 }
+
+// CheckDouYinAccessToken token校验
+func CheckDouYinAccessToken(ctx *fasthttp.RequestCtx) {
+	newRequest := &fasthttp.Request{}
+	ctx.Request.CopyTo(newRequest)
+
+	var req promotion.CheckTokenReq
+	if err := json.Unmarshal(newRequest.Body(), &req); err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+
+	if req.AccessToken == "" {
+		util.ResponseProcess(ctx, nil, "token is nil", 1)
+		return
+	}
+
+	response, err := http.Get(config.GlobalConfig.AuthAddress + "/oauth/check_token?access_token=" + req.AccessToken)
+	if err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+	defer response.Body.Close()
+	bJson, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+	var accessCheckData model.DouYinUserInfo
+	if err := json.Unmarshal(bJson, &accessCheckData); err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+	util.ResponseProcess(ctx, accessCheckData.Data, "success", 0)
+	return
+}
