@@ -49,6 +49,7 @@ func main() {
 
 	// UCENTER-GATEWAY
 	router.POST("/user", middleware.Cors(ucenter.GetUserInfoByOpenIdOrAccessToken)) // 根据信息获取用户的key
+	router.POST("/check", middleware.Cors(ucenter.CheckAccessToken))                // 根校验用户token
 
 	// hzzopenapi
 	router.POST("/area", middleware.Cors(promotion.GetArea)) // 获取运营区域

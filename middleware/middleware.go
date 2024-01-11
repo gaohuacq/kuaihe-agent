@@ -20,6 +20,8 @@ func Cors(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 			return
 		}
 
+		// TODO 加签验证
+
 		// 继续执行下一个处理器
 		next(c)
 	}

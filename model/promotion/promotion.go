@@ -1,5 +1,11 @@
 package promotion
 
+// ---------------------- 校验用户token --------------------------------------
+
+type CheckTokenReq struct {
+	AccessToken string `json:"access_token"`
+}
+
 // ---------------------- 创建券接口 --------------------------------------
 
 type CreateCouponReq struct {

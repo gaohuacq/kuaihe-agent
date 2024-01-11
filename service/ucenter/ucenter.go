@@ -4,13 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/valyala/fasthttp"
+	"io/ioutil"
+	"net/http"
 	"product_kuaihe/config"
+	"product_kuaihe/model"
+	"product_kuaihe/model/promotion"
 	"product_kuaihe/model/ucenter"
 	"product_kuaihe/util"
 )
 
 // GetUserInfoByOpenIdOrAccessToken 根据用户的opendid或者accesstoken获取用户信息
-
 func GetUserInfoByOpenIdOrAccessToken(ctx *fasthttp.RequestCtx) {
 	newRequest := &fasthttp.Request{}
 	ctx.Request.CopyTo(newRequest)
@@ -61,4 +64,40 @@ func getUserInfoRequest(address, appId, openId string) (*ucenter.FindUserInfoRes
 		return nil, err
 	}
 	return &resp, nil
+}
+
+// CheckAccessToken token校验
+func CheckAccessToken(ctx *fasthttp.RequestCtx) {
+	newRequest := &fasthttp.Request{}
+	ctx.Request.CopyTo(newRequest)
+
+	var req promotion.CheckTokenReq
+	if err := json.Unmarshal(newRequest.Body(), &req); err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+
+	if req.AccessToken == "" {
+		util.ResponseProcess(ctx, nil, "token is nil", 1)
+		return
+	}
+
+	response, err := http.Get(config.GlobalConfig.AuthAddress + "/oauth/check_token?access_token=" + req.AccessToken)
+	if err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+	defer response.Body.Close()
+	bJson, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+	var accessCheckData model.CheckAccessToken
+	if err := json.Unmarshal(bJson, &accessCheckData); err != nil {
+		util.ResponseProcess(ctx, nil, err.Error(), 1)
+		return
+	}
+	util.ResponseProcess(ctx, accessCheckData, err.Error(), 1)
+	return
 }

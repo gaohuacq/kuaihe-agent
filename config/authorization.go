@@ -33,24 +33,6 @@ func Authorization() (string, string, error) {
 	return authResponse.AccessToken, authResponse.TokenType, nil
 }
 
-// CheckAccessToken token校验
-func CheckAccessToken(accessToken string) (*model.CheckAccessToken, error) {
-	response, err := http.Get(GlobalConfig.AuthAddress + "/oauth/check_token?access_token=" + accessToken)
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-	bJson, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
-	var accessCheckData model.CheckAccessToken
-	if err := json.Unmarshal(bJson, &accessCheckData); err != nil {
-		return nil, err
-	}
-	return &accessCheckData, nil
-}
-
 func getAuthorization() (*model.AuthorizationResp, error) {
 	postData := url.Values{}
 	postData.Add("grant_type", "client_credentials")
