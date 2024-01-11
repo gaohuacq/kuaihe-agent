@@ -98,6 +98,6 @@ func CheckAccessToken(ctx *fasthttp.RequestCtx) {
 		util.ResponseProcess(ctx, nil, err.Error(), 1)
 		return
 	}
-	util.ResponseProcess(ctx, accessCheckData, err.Error(), 1)
+	util.ResponseProcess(ctx, accessCheckData.Data, "success", 1)
 	return
 }
