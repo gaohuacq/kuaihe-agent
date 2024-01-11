@@ -1,22 +1,16 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/buaazp/fasthttprouter"
 	"github.com/valyala/fasthttp"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"net/url"
 	"product_kuaihe/config"
 	"product_kuaihe/middleware"
-	"product_kuaihe/model"
 	"product_kuaihe/service/product_center"
 	"product_kuaihe/service/promotion"
 	"product_kuaihe/service/ucenter"
 	"product_kuaihe/util"
-	"strings"
 )
 
 func main() {
@@ -87,30 +81,4 @@ func ProductSearch(ctx *fasthttp.RequestCtx) {
 	//bJson, _ := json.Marshal(resp)
 	//ctx.Response.Write(bufio.NewWriter(bytes.NewBuffer(bJson)))
 	//return
-}
-
-// Auth 测试方便用 获取clientid的 accesstoken
-func Auth() {
-	postData := url.Values{}
-	postData.Add("grant_type", "client_credentials")
-	postData.Add("client_id", config.GlobalConfig.ClientID)
-	postData.Add("client_secret", config.GlobalConfig.ClientSecret)
-	response, err := http.Post(config.GlobalConfig.AuthAddress+"/oauth/token", "application/x-www-form-urlencoded", strings.NewReader(postData.Encode()))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer response.Body.Close()
-	bJson, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	var authResponse model.AuthorizationResp
-	err = json.Unmarshal(bJson, &authResponse)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Printf("authinfo: %+v\n", authResponse)
 }

@@ -8,8 +8,6 @@ type Config struct {
 	AuthAddress                 string `yaml:"auth_address"`                  // 权限accesstoken获取地址
 	ProcessAuthorizationSeconds int64  `yaml:"process_authorization_seconds"` // 提前处理accesstoken的秒数
 	AuthorizationFresh          int64  `yaml:"authorization_fresh"`           // 刷新accesstoken的秒数
-
-	Redis RedisConfig `yaml:"redis"`
 }
 
 type RedisConfig struct {

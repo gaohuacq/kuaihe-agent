@@ -1,9 +1,7 @@
 package config
 
 import (
-	"fmt"
 	"github.com/ArthurHlt/go-eureka-client/eureka"
-	"github.com/go-redis/redis"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"runtime/debug"
@@ -22,20 +20,6 @@ func InitFreeCache() error {
 	cache := freecache.NewCache(cacheSize)
 	debug.SetGCPercent(20)
 	FreeCache = cache
-	return nil
-}
-
-func InitRedis() error {
-	server := fmt.Sprintf("%v:%v", GlobalConfig.Redis.Host, GlobalConfig.Redis.Port)
-	c := redis.NewClient(&redis.Options{
-		Addr:     server,
-		Password: GlobalConfig.Redis.Password,
-		DB:       0,
-	})
-	_, err := c.Ping().Result()
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
