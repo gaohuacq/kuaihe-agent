@@ -19,7 +19,6 @@ WORKDIR /go/src/kuaihe
 
 COPY --from=0 /go/src/kuaihe-agent/kuaihe ./
 COPY --from=0 /go/src/kuaihe-agent/config.yaml ./
-COPY --from=0 /go/src/kuaihe-agent/config_prod.yaml ./
 
 EXPOSE 8080
 ENTRYPOINT ./kuaihe -c config.yaml
