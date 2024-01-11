@@ -1,6 +1,6 @@
 port: 8089
-client_id: kuaihe-mp-test
-client_secret: xf6y7AqYSd22wYhrOScm3ovKHOVn6itN
+client_id: kuaihe-mp
+client_secret: sKD1hwau9JhCEzrFpwhhvQ2qK13ShHrN
 eureka_address: http://gateway:Pkf20MskIgTYNeOu@192.168.73.174:7777/eureka,http://gateway:Pkf20MskIgTYNeOu@192.168.89.125:7777/eureka # eureka地址
 auth_address: http://auth-internal.1919.cn # auth内网地址
 process_authorization_seconds: 180
